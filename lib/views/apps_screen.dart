@@ -19,8 +19,8 @@ class AppListScreen extends ConsumerWidget {
           final appIcon = iconPath != null
               ? Image.file(
                   File(iconPath),
-                  width: 40,
-                  height: 40,
+                  width: 30,
+                  height: 30,
                 )
               : const Icon(Icons.apps);
 
@@ -31,7 +31,7 @@ class AppListScreen extends ConsumerWidget {
                 ? TextAlign.center
                 : TextAlign.left,
             overflow: TextOverflow.fade,
-            maxLines: 2,
+            maxLines: 1,
           );
 
           return InkWell(
