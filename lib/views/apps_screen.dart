@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get/get.dart';
 import 'package:theme_launcher/controller/app_screen_controller.dart';
 import 'package:theme_launcher/provider/app_icon_provider.dart';
+import 'package:theme_launcher/views/settings_screen.dart';
 
 class AppListScreen extends ConsumerWidget {
   const AppListScreen({super.key});
@@ -85,6 +87,12 @@ class AppListScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => ref.read(appsProvider.notifier).loadApps(),
+          ),
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              Get.to(const SettingsScreen());
+            },
           ),
         ],
       ),
