@@ -1,54 +1,87 @@
-import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:installed_apps/installed_apps.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:theme_launcher/services/native_service.dart';
 
-// Define the state of the installed apps
-class AppListState {
+// State class to handle loading and error states
+enum ViewType { grid, list }
+
+class AppsState {
   final List<dynamic> apps;
   final bool isLoading;
+  final String? error;
+  final ViewType viewType; // Add this line
 
-  AppListState({this.apps = const [], this.isLoading = false});
-}
+  AppsState({
+    required this.apps,
+    this.isLoading = false,
+    this.error,
+    this.viewType = ViewType.grid, // Default to grid view
+  });
 
-// Create a StateNotifier to manage the apps
-class AppListNotifier extends StateNotifier<AppListState> {
-  AppListNotifier() : super(AppListState());
-
-  Future<void> loadInstalledApps() async {
-    state = AppListState(isLoading: true);
-    try {
-      final apps = await InstalledApps.getInstalledApps();
-      state = AppListState(apps: apps);
-    } catch (e) {
-      print('Error loading apps: $e');
-      state = AppListState(apps: [], isLoading: false);
-    }
-  }
-
-  Future<String?> getIconPath(String packageName) async {
-    final cacheDir = await getApplicationDocumentsDirectory();
-    final iconFile = File('${cacheDir.path}/$packageName.png');
-
-    if (await iconFile.exists()) {
-      return iconFile.path;
-    }
-
-    try {
-      final appInfo = await InstalledApps.getAppInfo(packageName);
-      if (appInfo?.icon != null) {
-        await iconFile.writeAsBytes(appInfo!.icon!);
-        return iconFile.path;
-      }
-    } catch (e) {
-      print("Error saving icon for $packageName: $e");
-    }
-
-    return null;
+  AppsState copyWith({
+    List<dynamic>? apps,
+    bool? isLoading,
+    String? error,
+    ViewType? viewType,
+  }) {
+    return AppsState(
+      apps: apps ?? this.apps,
+      isLoading: isLoading ?? this.isLoading,
+      error: error,
+      viewType: viewType ?? this.viewType,
+    );
   }
 }
 
-// Create a provider for the AppListNotifier
-final appListProvider = StateNotifierProvider<AppListNotifier, AppListState>(
-  (ref) => AppListNotifier(),
-);
+// Apps notifier to handle state changes (business logic)
+class AppsNotifier extends StateNotifier<AppsState> {
+  final LauncherService _launcherService;
+
+  AppsNotifier(this._launcherService) : super(AppsState(apps: [])) {
+    loadApps();
+  }
+
+//toggle apps
+  void toggleViewType() {
+    state = state.copyWith(
+      viewType: state.viewType == ViewType.grid ? ViewType.list : ViewType.grid,
+    );
+  }
+
+  Future<void> loadApps() async {
+    state = state.copyWith(isLoading: true, error: null);
+
+    try {
+      final apps = await _launcherService.getInstalledApps();
+      state = state.copyWith(
+        apps: apps,
+        isLoading: false,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Failed to load apps: $e',
+      );
+    }
+  }
+
+  Future<void> launchApp(String packageName) async {
+    await _launcherService.launchApp(packageName);
+  }
+
+  Future<void> uninstallApp(String packageName) async {
+    await _launcherService.uninstallApp(packageName);
+    loadApps();
+  }
+
+  Future<void> closeApp(String packageName) async {
+    await _launcherService.closeApp(packageName);
+  }
+}
+
+// Providers
+final launcherServiceProvider = Provider((ref) => LauncherService());
+
+final appsProvider = StateNotifierProvider<AppsNotifier, AppsState>((ref) {
+  final launcherService = ref.watch(launcherServiceProvider);
+  return AppsNotifier(launcherService);
+});

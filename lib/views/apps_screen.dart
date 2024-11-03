@@ -1,133 +1,137 @@
-import 'dart:io'; // Impor0t for File
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:installed_apps/installed_apps.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:theme_launcher/controller/native_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:theme_launcher/controller/app_screen_controller.dart';
+import 'package:theme_launcher/provider/app_icon_provider.dart';
 
-class AppListScreen extends StatefulWidget {
+class AppListScreen extends ConsumerWidget {
   const AppListScreen({super.key});
 
   @override
-  _AppListScreenState createState() => _AppListScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final appsState = ref.watch(appsProvider);
 
-class _AppListScreenState extends State<AppListScreen> {
-  final LauncherService _launcherService = LauncherService();
-  List<dynamic> _apps = [];
-  List<dynamic> _filteredApps = [];
-  bool _isLoading = true;
+    Widget buildAppItem(dynamic app, AsyncValue<String?> iconAsync) {
+      return iconAsync.when(
+        data: (iconPath) {
+          final appIcon = iconPath != null
+              ? Image.file(
+                  File(iconPath),
+                  width: 40,
+                  height: 40,
+                )
+              : const Icon(Icons.apps);
 
-  @override
-  void initState() {
-    super.initState();
-    _loadInstalledApps();
-  }
+          final appName = Text(
+            app['appName'] ?? 'Unknown App',
+            style: const TextStyle(fontWeight: FontWeight.w500),
+            textAlign: appsState.viewType == ViewType.grid
+                ? TextAlign.center
+                : TextAlign.left,
+            overflow: TextOverflow.fade,
+            maxLines: 2,
+          );
 
-  Future<void> _loadInstalledApps() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      final apps = await _launcherService.getInstalledApps();
-      setState(() {
-        _apps = apps;
-        _filteredApps = apps;
-        _isLoading = false;
-      });
-    } catch (e) {
-      print('Error loading apps: $e');
-      setState(() {
-        _isLoading = false;
-      });
+          return InkWell(
+            onTap: () =>
+                ref.read(appsProvider.notifier).launchApp(app['packageName']),
+            child: appsState.viewType == ViewType.grid
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: 60,
+                        height: 60,
+                        child: appIcon,
+                      ),
+                      const SizedBox(height: 8),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: appName,
+                      ),
+                    ],
+                  )
+                : ListTile(
+                    leading: appIcon,
+                    title: appName,
+                  ),
+          );
+        },
+        loading: () => appsState.viewType == ViewType.grid
+            ? const Center(child: CircularProgressIndicator())
+            : const ListTile(
+                leading: CircularProgressIndicator(),
+                title: Text('Loading...'),
+              ),
+        error: (error, stack) => appsState.viewType == ViewType.grid
+            ? const Center(child: Icon(Icons.error))
+            : ListTile(
+                leading: const Icon(Icons.error),
+                title: Text('Error: $error'),
+              ),
+      );
     }
-  }
 
-  Future<String?> _getIconPath(String packageName) async {
-    final cacheDir = await getApplicationDocumentsDirectory();
-    final iconFile = File('${cacheDir.path}/$packageName.png');
-
-    if (await iconFile.exists()) {
-      return iconFile.path;
-    }
-
-    try {
-      final appInfo = await InstalledApps.getAppInfo(
-          packageName); // Assume this method retrieves app info
-      if (appInfo?.icon != null) {
-        await iconFile.writeAsBytes(appInfo!.icon!);
-        return iconFile.path;
-      }
-    } catch (e) {
-      print("Error saving icon for $packageName: $e");
-    }
-
-    return null;
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Installed Apps'),
+        title: const Text('All Apps'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.table_rows_rounded),
-            onPressed: () {
-              //
-            },
+            icon: Icon(appsState.viewType == ViewType.grid
+                ? Icons.list
+                : Icons.grid_view),
+            onPressed: () => ref.read(appsProvider.notifier).toggleViewType(),
           ),
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: _loadInstalledApps,
+            onPressed: () => ref.read(appsProvider.notifier).loadApps(),
           ),
         ],
       ),
       body: Column(
         children: [
           Expanded(
-            child: _isLoading
+            child: appsState.isLoading
                 ? const Center(child: CircularProgressIndicator())
-                : _filteredApps.isEmpty
-                    ? const Center(child: Text('No apps found'))
-                    : ListView.builder(
-                        itemCount: _filteredApps.length,
-                        itemBuilder: (context, index) {
-                          final app = _filteredApps[index];
-                          return FutureBuilder<String?>(
-                            future: _getIconPath(app['packageName']),
-                            builder: (context, snapshot) {
-                              Widget leadingWidget;
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                leadingWidget =
-                                    const CircularProgressIndicator(); // Show a loading indicator while fetching
-                              } else if (snapshot.hasError ||
-                                  snapshot.data == null) {
-                                leadingWidget =
-                                    const Icon(Icons.apps); // Fallback icon
-                              } else {
-                                leadingWidget = Image.file(
-                                  File(snapshot.data!),
-                                  width: 40,
-                                  height: 40,
-                                );
-                              }
-
-                              return ListTile(
-                                leading: leadingWidget,
-                                title: Text(
-                                  app['appName'] ?? 'Unknown App',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w500),
+                : appsState.error != null
+                    ? Center(child: Text(appsState.error!))
+                    : appsState.apps.isEmpty
+                        ? const Center(child: Text('No apps found'))
+                        : appsState.viewType == ViewType.grid
+                            ? GridView.builder(
+                                padding: const EdgeInsets.all(16),
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 4,
+                                  childAspectRatio: 0.75,
+                                  crossAxisSpacing: 16,
+                                  mainAxisSpacing: 16,
                                 ),
-                                onTap: () => _launcherService
-                                    .launchApp(app['packageName']),
-                              );
-                            },
-                          );
-                        },
-                      ),
+                                itemCount: appsState.apps.length,
+                                itemBuilder: (context, index) {
+                                  final app = appsState.apps[index];
+                                  return Consumer(
+                                    builder: (context, ref, child) {
+                                      final iconAsync = ref.watch(
+                                          appIconProvider(app['packageName']));
+                                      return buildAppItem(app, iconAsync);
+                                    },
+                                  );
+                                },
+                              )
+                            : ListView.builder(
+                                itemCount: appsState.apps.length,
+                                itemBuilder: (context, index) {
+                                  final app = appsState.apps[index];
+                                  return Consumer(
+                                    builder: (context, ref, child) {
+                                      final iconAsync = ref.watch(
+                                          appIconProvider(app['packageName']));
+                                      return buildAppItem(app, iconAsync);
+                                    },
+                                  );
+                                },
+                              ),
           ),
         ],
       ),
