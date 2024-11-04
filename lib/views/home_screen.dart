@@ -9,12 +9,26 @@ class HomeScreen extends StatelessWidget {
     final h1 = MediaQuery.of(context).size.height;
     final w1 = MediaQuery.of(context).size.width;
 
-    return Scaffold(
-      appBar: AppBar(),
-      body: SingleChildScrollView(
-        child: Column(
+    return GestureDetector(
+      //todo:
+      // onVerticalDragEnd: (details) async {
+      //   if (details.primaryVelocity! > 0) {
+      //     print(
+      //         "Vertical drag ended: Drag down detected, opening notification panel.");
+      //     try {
+      //       await NotificationPanelService.openNotificationPanel();
+      //     } catch (e) {
+      //       print("Error opening notification panel: $e");
+      //     }
+      //   } else {
+      //     print(
+      //         "Vertical drag ended: No significant vertical movement detected.");
+      //   }
+      // },
+      child: Scaffold(
+        appBar: AppBar(),
+        body: Column(
           children: [
-            // Minimal Style
             Container(
               height: h1 * 0.2,
               width: w1,
