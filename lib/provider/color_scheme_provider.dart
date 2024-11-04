@@ -1,4 +1,3 @@
-// main.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -11,11 +10,11 @@ class ThemeNotifier extends StateNotifier<ThemeData> {
   ThemeNotifier()
       : super(
           ThemeData(
-            primaryColor: const Color(0xff443a49),
+            primaryColor: Colors.white,
             colorScheme: ColorScheme.fromSeed(
-              seedColor: const Color(0xff443a49),
-              primary: const Color(0xff443a49),
-              secondary: const Color(0xff443a49),
+              seedColor: Colors.white,
+              primary: Colors.white,
+              secondary: Colors.black,
             ),
           ),
         );
