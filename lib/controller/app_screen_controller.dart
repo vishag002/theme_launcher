@@ -52,6 +52,16 @@ class AppsNotifier extends StateNotifier<AppsState> {
 
     try {
       final apps = await _launcherService.getInstalledApps();
+
+      if (apps != null) {
+        // Sort the apps list by app name in alphabetical order (case-insensitive)
+        apps.sort((a, b) {
+          final nameA = (a['appName'] ?? 'Unknown App').trim().toLowerCase();
+          final nameB = (b['appName'] ?? 'Unknown App').trim().toLowerCase();
+          return nameA.compareTo(nameB);
+        });
+      }
+
       state = state.copyWith(
         apps: apps,
         isLoading: false,

@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:theme_launcher/controller/app_screen_controller.dart';
 import 'package:theme_launcher/provider/app_icon_provider.dart';
 import 'package:theme_launcher/views/settings_screen.dart';
-import 'package:theme_launcher/widgets/clock%20widgets/app_info_popUP_widget.dart';
 
 class AppListScreen extends ConsumerWidget {
   const AppListScreen({super.key});
@@ -13,14 +12,6 @@ class AppListScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Empty functions as placeholders
-
-    void _addToHomeScreen() {}
-
-    void _hideApp() {}
-
-    void _uninstallApp(BuildContext context) {}
-
-    void _showAppInfo() {}
 
     final appsState = ref.watch(appsProvider);
 
@@ -46,20 +37,7 @@ class AppListScreen extends ConsumerWidget {
           );
 
           return InkWell(
-            onLongPress: () {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return SimpleAlertDialogWidget(
-                    appName: app['appName'] ?? 'Unknown App',
-                    onAddToHomeScreen: () => _addToHomeScreen(),
-                    onHideApp: () => _hideApp(),
-                    onUninstallApp: () => _uninstallApp(context),
-                    onAppInfo: () => _showAppInfo(),
-                  );
-                },
-              );
-            },
+            onLongPress: () {},
             onTap: () =>
                 ref.read(appsProvider.notifier).launchApp(app['packageName']),
             child: appsState.viewType == ViewType.grid
@@ -88,18 +66,7 @@ class AppListScreen extends ConsumerWidget {
             ? const Center(child: CircularProgressIndicator())
             : ListTile(
                 onLongPress: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return SimpleAlertDialogWidget(
-                        appName: app['appName'] ?? 'Unknown App',
-                        onAddToHomeScreen: () => _addToHomeScreen(),
-                        onHideApp: () => _hideApp(),
-                        onUninstallApp: () => _uninstallApp(context),
-                        onAppInfo: () => _showAppInfo(),
-                      );
-                    },
-                  );
+                  //TODO:
                 },
                 leading: CircularProgressIndicator(),
                 title: Text('Loading...'),

@@ -70,3 +70,25 @@ class SimpleAlertDialogWidget extends StatelessWidget {
     );
   }
 }
+
+void _addToHomeScreen() {}
+
+void _hideApp() {}
+
+void _uninstallApp(BuildContext context) {}
+
+void _showAppInfo() {}
+
+
+  // showDialog(
+  //               context: context,
+  //               builder: (BuildContext context) {
+  //                 return SimpleAlertDialogWidget(
+  //                   appName: app['appName'] ?? 'Unknown App',
+  //                   onAddToHomeScreen: () => _addToHomeScreen(),
+  //                   onHideApp: () => _hideApp(),
+  //                   onUninstallApp: () => _uninstallApp(context),
+  //                   onAppInfo: () => _showAppInfo(),
+  //                 );
+  //               },
+  //             );
