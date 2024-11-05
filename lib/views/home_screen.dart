@@ -28,15 +28,40 @@ class HomeScreen extends ConsumerWidget {
     final w1 = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      appBar: AppBar(),
-      body: Column(
+      body: Stack(
         children: [
-          SizedBox(
-            height: h1 * 0.23,
-            width: w1,
-            child: Center(
-              child: clockWidgetsList[selectedClockIndex],
+          // Background image
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: NetworkImage(
+                    'https://i0.wp.com/www.3wallpapers.fr/wp-content/uploads/2018/04/iPhone-wallpaper-bmw-black.jpg?w=1080&ssl=1'),
+                fit: BoxFit.cover,
+              ),
             ),
+          ),
+          Column(
+            children: [
+              Container(
+                //color: Colors.amber,
+                height: 50,
+              ),
+              Container(
+                //color: Colors.amber,
+                height: h1 * 0.23,
+                width: w1,
+                child: Center(
+                  child: clockWidgetsList[selectedClockIndex],
+                ),
+              ),
+              Expanded(
+                // TODO:favorite apps list
+                child: Container(
+                  // color: Colors.amber.withOpacity(0.5),
+                  width: w1,
+                ),
+              ),
+            ],
           ),
         ],
       ),
