@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:theme_launcher/controller/time_controller.dart';
+import 'package:theme_launcher/provider/clock_widget_provider.dart';
 import 'package:theme_launcher/widgets/carouseL_widget.dart';
-import 'package:theme_launcher/widgets/clock widgets/clock_widget_1.dart';
 
 // Provider to track the selected clock widget index
 final selectedClockWidgetProvider = StateProvider<int>((ref) => 0);
@@ -13,17 +12,8 @@ class ClockWidgetScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final timerModel = ref.watch(timerControllerProvider);
+    final clockWidgetsList = ref.watch(clockWidgetListProvider);
     final selectedClockIndex = ref.watch(selectedClockWidgetProvider);
-
-    // List of clock widgets
-    final List<Widget> clockWidgetsList = [
-      ClockWidget1(timerModel: timerModel),
-      ClockWidget2(timerModel: timerModel),
-      ClockWidget3(timerModel: timerModel),
-      ClockWidget4(timerModel: timerModel),
-      ClockWidget5(timerModel: timerModel),
-    ];
 
     // Convert clock widgets to CarouselItems
     final carouselItems = List.generate(

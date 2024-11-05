@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:theme_launcher/controller/time_controller.dart';
+import 'package:theme_launcher/provider/clock_widget_provider.dart';
 import 'package:theme_launcher/views/clock_widget_screen.dart';
-import 'package:theme_launcher/widgets/clock%20widgets/clock_widget_1.dart';
 
 final selectedClockWidgetProvider = StateProvider<int>((ref) => 0);
 
@@ -18,17 +16,8 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final timerModel = ref.watch(timerControllerProvider);
+    final clockWidgetsList = ref.watch(clockWidgetListProvider);
     final selectedClockIndex = ref.watch(selectedClockWidgetProvider);
-
-    // List of available clock widgets
-    final List clockWidgetsList = [
-      ClockWidget1(timerModel: timerModel),
-      ClockWidget2(timerModel: timerModel),
-      ClockWidget3(timerModel: timerModel),
-      ClockWidget4(timerModel: timerModel),
-      ClockWidget5(timerModel: timerModel),
-    ];
 
     // Initialize the selected index on the first build
     _loadSelectedClockIndex().then((savedIndex) {
@@ -42,7 +31,7 @@ class HomeScreen extends ConsumerWidget {
       appBar: AppBar(),
       body: Column(
         children: [
-          Container(
+          SizedBox(
             height: h1 * 0.23,
             width: w1,
             child: Center(
@@ -54,7 +43,10 @@ class HomeScreen extends ConsumerWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // Navigate to ClockWidgetScreen
-          Get.to(() => const ClockWidgetScreen());
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ClockWidgetScreen()),
+          );
         },
         child: const Icon(Icons.watch),
       ),
