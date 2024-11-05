@@ -65,16 +65,6 @@ class HomeScreen extends ConsumerWidget {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Navigate to ClockWidgetScreen
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const ClockWidgetScreen()),
-          );
-        },
-        child: const Icon(Icons.watch),
-      ),
     );
   }
 }
