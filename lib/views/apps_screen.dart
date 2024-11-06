@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:theme_launcher/controller/app_screen_controller.dart';
 import 'package:theme_launcher/provider/app_icon_provider.dart';
 import 'package:theme_launcher/views/settings_screen.dart';
-import 'package:theme_launcher/widgets/clock%20widgets/app_info_popUP_widget.dart';
+import 'package:theme_launcher/widgets/app_info_popUP_widget.dart';
 
 class AppListScreen extends ConsumerWidget {
   const AppListScreen({super.key});
