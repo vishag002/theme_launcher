@@ -59,6 +59,16 @@ class HomeScreen extends ConsumerWidget {
                 child: Container(
                   // color: Colors.amber.withOpacity(0.5),
                   width: w1,
+                  child: ListView.builder(
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: 5,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        textColor: Colors.white,
+                        title: Text("data"),
+                      );
+                    },
+                  ),
                 ),
               ),
             ],

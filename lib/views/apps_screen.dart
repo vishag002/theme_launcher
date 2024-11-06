@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:theme_launcher/controller/app_screen_controller.dart';
 import 'package:theme_launcher/provider/app_icon_provider.dart';
 import 'package:theme_launcher/views/settings_screen.dart';
+import 'package:theme_launcher/widgets/clock%20widgets/app_info_popUP_widget.dart';
 
 class AppListScreen extends ConsumerWidget {
   const AppListScreen({super.key});
@@ -37,7 +38,28 @@ class AppListScreen extends ConsumerWidget {
           );
 
           return InkWell(
-            onLongPress: () {},
+            onLongPress: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return SimpleAlertDialogWidget(
+                    appName: app['appName'] ?? 'Unknown App',
+                    onAddToHomeScreen: () => ref
+                        .read(appsProvider.notifier)
+                        .addToHomeScreen(app['packageName'], context),
+                    onHideApp: () => ref
+                        .read(appsProvider.notifier)
+                        .hideApp(app['packageName'], context),
+                    onUninstallApp: () => ref
+                        .read(appsProvider.notifier)
+                        .uninstallApp(app['packageName'], context),
+                    onAppInfo: () => ref
+                        .read(appsProvider.notifier)
+                        .appInfo(app['packageName'], context),
+                  );
+                },
+              );
+            },
             onTap: () =>
                 ref.read(appsProvider.notifier).launchApp(app['packageName']),
             child: appsState.viewType == ViewType.grid
@@ -66,7 +88,26 @@ class AppListScreen extends ConsumerWidget {
             ? const Center(child: CircularProgressIndicator())
             : ListTile(
                 onLongPress: () {
-                  //TODO:
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return SimpleAlertDialogWidget(
+                        appName: app['appName'] ?? 'Unknown App',
+                        onAddToHomeScreen: () => ref
+                            .read(appsProvider.notifier)
+                            .addToHomeScreen(app['packageName'], context),
+                        onHideApp: () => ref
+                            .read(appsProvider.notifier)
+                            .hideApp(app['packageName'], context),
+                        onUninstallApp: () => ref
+                            .read(appsProvider.notifier)
+                            .uninstallApp(app['packageName'], context),
+                        onAppInfo: () => ref
+                            .read(appsProvider.notifier)
+                            .appInfo(app['packageName'], context),
+                      );
+                    },
+                  );
                 },
                 leading: CircularProgressIndicator(),
                 title: Text('Loading...'),

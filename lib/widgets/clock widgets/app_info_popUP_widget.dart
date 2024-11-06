@@ -47,10 +47,11 @@ class SimpleAlertDialogWidget extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildFunctionTile('Add to homescreen', onAddToHomeScreen),
-                _buildFunctionTile('Hide', onHideApp),
-                _buildFunctionTile('Uninstall', onUninstallApp),
-                _buildFunctionTile('App info', onAppInfo),
+                _buildFunctionTile(
+                    'Add to homescreen', onAddToHomeScreen, context),
+                _buildFunctionTile('Hide', onHideApp, context),
+                _buildFunctionTile('Uninstall', onUninstallApp, context),
+                _buildFunctionTile('App info', onAppInfo, context),
               ],
             ),
           ],
@@ -59,36 +60,15 @@ class SimpleAlertDialogWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildFunctionTile(String title, Function onTap) {
+  Widget _buildFunctionTile(String title, Function onTap, context) {
     return ListTile(
       title: Text(
         title,
-        style: const TextStyle(fontSize: 16),
+        style: TextStyle(
+            color: Theme.of(context).colorScheme.secondary, fontSize: 16),
       ),
       onTap: () => onTap(),
       contentPadding: EdgeInsets.zero,
     );
   }
 }
-
-void _addToHomeScreen() {}
-
-void _hideApp() {}
-
-void _uninstallApp(BuildContext context) {}
-
-void _showAppInfo() {}
-
-
-  // showDialog(
-  //               context: context,
-  //               builder: (BuildContext context) {
-  //                 return SimpleAlertDialogWidget(
-  //                   appName: app['appName'] ?? 'Unknown App',
-  //                   onAddToHomeScreen: () => _addToHomeScreen(),
-  //                   onHideApp: () => _hideApp(),
-  //                   onUninstallApp: () => _uninstallApp(context),
-  //                   onAppInfo: () => _showAppInfo(),
-  //                 );
-  //               },
-  //             );

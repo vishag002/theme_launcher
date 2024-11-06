@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:theme_launcher/services/app_info_service.dart';
 import 'package:theme_launcher/services/native_service.dart';
 
 // State class to handle loading and error states
@@ -8,13 +10,12 @@ class AppsState {
   final List<dynamic> apps;
   final bool isLoading;
   final String? error;
-  final ViewType viewType; // Add this line
-
+  final ViewType viewType;
   AppsState({
     required this.apps,
     this.isLoading = false,
     this.error,
-    this.viewType = ViewType.grid, // Default to grid view
+    this.viewType = ViewType.grid,
   });
 
   AppsState copyWith({
@@ -54,7 +55,6 @@ class AppsNotifier extends StateNotifier<AppsState> {
       final apps = await _launcherService.getInstalledApps();
 
       if (apps != null) {
-        // Sort the apps list by app name in alphabetical order (case-insensitive)
         apps.sort((a, b) {
           final nameA = (a['appName'] ?? 'Unknown App').trim().toLowerCase();
           final nameB = (b['appName'] ?? 'Unknown App').trim().toLowerCase();
@@ -78,13 +78,30 @@ class AppsNotifier extends StateNotifier<AppsState> {
     await _launcherService.launchApp(packageName);
   }
 
-  Future<void> uninstallApp(String packageName) async {
+  Future<void> uninstallApp(String packageName, context) async {
     await _launcherService.uninstallApp(packageName);
-    loadApps();
+    // TODO:update only if the app is uninstalled
+    //loadApps();
+    Navigator.pop(context);
   }
 
   Future<void> closeApp(String packageName) async {
     await _launcherService.closeApp(packageName);
+  }
+
+  Future<void> addToHomeScreen(String packageName, context) async {
+    await _launcherService.closeApp(packageName);
+    Navigator.pop(context);
+  }
+
+  Future<void> hideApp(String packageName, context) async {
+    await _launcherService.closeApp(packageName);
+    Navigator.pop(context);
+  }
+
+  Future<void> appInfo(String packageName, context) async {
+    AppInfoHelper.openAppInfo(packageName);
+    Navigator.pop(context);
   }
 }
 
