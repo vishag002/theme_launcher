@@ -6,13 +6,19 @@ import 'package:theme_launcher/services/native_service.dart';
 // State class to handle loading and error states
 enum ViewType { grid, list }
 
+// Updated AppsState class to manage hidden and favorite apps
 class AppsState {
   final List<dynamic> apps;
+  final List<dynamic> favoriteApps; // List to track favorite apps
+  final List<dynamic> hiddenApps; // List to track hidden apps
   final bool isLoading;
   final String? error;
   final ViewType viewType;
+
   AppsState({
     required this.apps,
+    this.favoriteApps = const [],
+    this.hiddenApps = const [],
     this.isLoading = false,
     this.error,
     this.viewType = ViewType.grid,
@@ -20,12 +26,16 @@ class AppsState {
 
   AppsState copyWith({
     List<dynamic>? apps,
+    List<dynamic>? favoriteApps,
+    List<dynamic>? hiddenApps,
     bool? isLoading,
     String? error,
     ViewType? viewType,
   }) {
     return AppsState(
       apps: apps ?? this.apps,
+      favoriteApps: favoriteApps ?? this.favoriteApps,
+      hiddenApps: hiddenApps ?? this.hiddenApps,
       isLoading: isLoading ?? this.isLoading,
       error: error,
       viewType: viewType ?? this.viewType,
@@ -33,7 +43,7 @@ class AppsState {
   }
 }
 
-// Apps notifier to handle state changes (business logic)
+// Updated AppsNotifier class
 class AppsNotifier extends StateNotifier<AppsState> {
   final LauncherService _launcherService;
 
@@ -41,7 +51,6 @@ class AppsNotifier extends StateNotifier<AppsState> {
     loadApps();
   }
 
-//toggle apps
   void toggleViewType() {
     state = state.copyWith(
       viewType: state.viewType == ViewType.grid ? ViewType.list : ViewType.grid,
@@ -80,8 +89,28 @@ class AppsNotifier extends StateNotifier<AppsState> {
 
   Future<void> uninstallApp(String packageName, context) async {
     await _launcherService.uninstallApp(packageName);
-    // TODO:update only if the app is uninstalled
-    //loadApps();
+    Navigator.pop(context);
+    loadApps(); // Reload the apps list after uninstalling
+  }
+
+  // Add to home screen (favorite)
+  Future<void> addToHomeScreen(String packageName, context) async {
+    final updatedFavorites = List.from(state.favoriteApps);
+    if (!updatedFavorites.contains(packageName)) {
+      updatedFavorites.add(packageName);
+    }
+    state = state.copyWith(favoriteApps: updatedFavorites);
+    Navigator.pop(context);
+  }
+
+  // Hide app
+  Future<void> hideApp(String packageName, context) async {
+    // Check if already in hiddenApps; if not, add to hiddenApps list
+    final updatedHiddenApps = List.from(state.hiddenApps);
+    if (!updatedHiddenApps.contains(packageName)) {
+      updatedHiddenApps.add(packageName);
+    }
+    state = state.copyWith(hiddenApps: updatedHiddenApps);
     Navigator.pop(context);
   }
 
@@ -89,19 +118,16 @@ class AppsNotifier extends StateNotifier<AppsState> {
     await _launcherService.closeApp(packageName);
   }
 
-  Future<void> addToHomeScreen(String packageName, context) async {
-    await _launcherService.closeApp(packageName);
-    Navigator.pop(context);
-  }
-
-  Future<void> hideApp(String packageName, context) async {
-    await _launcherService.closeApp(packageName);
-    Navigator.pop(context);
-  }
-
   Future<void> appInfo(String packageName, context) async {
     AppInfoHelper.openAppInfo(packageName);
     Navigator.pop(context);
+  }
+
+  //
+  Future<void> removeFromHomeScreen(String packageName, context) async {
+    final updatedFavorites = List.from(state.favoriteApps);
+    updatedFavorites.remove(packageName);
+    state = state.copyWith(favoriteApps: updatedFavorites);
   }
 }
 
@@ -111,4 +137,12 @@ final launcherServiceProvider = Provider((ref) => LauncherService());
 final appsProvider = StateNotifierProvider<AppsNotifier, AppsState>((ref) {
   final launcherService = ref.watch(launcherServiceProvider);
   return AppsNotifier(launcherService);
+});
+
+///
+final filteredAppsProvider = Provider<List<dynamic>>((ref) {
+  final appsState = ref.watch(appsProvider);
+  return appsState.apps
+      .where((app) => !appsState.hiddenApps.contains(app['packageName']))
+      .toList();
 });
