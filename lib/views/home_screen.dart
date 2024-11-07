@@ -1,9 +1,7 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:theme_launcher/controller/app_screen_controller.dart';
-import 'package:theme_launcher/provider/app_icon_provider.dart';
 import 'package:theme_launcher/provider/clock_widget_provider.dart';
 import 'package:theme_launcher/widgets/home_screen_lists/apps_list_widget1.dart';
 
@@ -11,6 +9,9 @@ final selectedClockWidgetProvider = StateProvider<int>((ref) => 0);
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
+//app list widget
+
+  //clock widget
   Future<int> _loadSelectedClockIndex() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getInt('selectedClockIndex') ?? 0;
@@ -67,7 +68,9 @@ class HomeScreen extends ConsumerWidget {
                   width: w1,
                   child: favoriteApps.isEmpty
                       ? Center(child: Text('No apps added to home screen'))
-                      : AppsListWidget5(),
+                      : AppsListWidget1(
+                          favoriteApps: favoriteApps.cast<String>(),
+                        ),
                 ),
               ),
             ],
