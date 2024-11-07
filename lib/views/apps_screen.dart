@@ -43,7 +43,7 @@ class AppListScreen extends ConsumerWidget {
                 context: context,
                 builder: (BuildContext context) {
                   return SimpleAlertDialogWidget(
-                    appName: app['appName'] ?? 'Unknown App',
+                    appName: app['packageName'] ?? 'Unknown App',
                     onAddToHomeScreen: () => ref
                         .read(appsProvider.notifier)
                         .addToHomeScreen(app['packageName'], context),

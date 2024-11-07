@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 import 'package:theme_launcher/views/clock_widget_screen.dart';
-import 'package:theme_launcher/views/favourite_list_widget.dart';
+import 'package:theme_launcher/views/apps_list_widget_screen.dart';
 
 class CustomizationScreen extends ConsumerWidget {
   const CustomizationScreen({super.key});
@@ -27,7 +27,7 @@ class CustomizationScreen extends ConsumerWidget {
           ListTile(
             title: Text("list style"),
             onTap: () {
-              Get.to(const FavouriteListWidget());
+              Get.to(const AppsListWidgetScreen());
             },
           )
         ],

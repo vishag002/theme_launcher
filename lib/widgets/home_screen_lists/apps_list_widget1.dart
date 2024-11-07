@@ -1,20 +1,22 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:theme_launcher/controller/app_screen_controller.dart';
 import 'package:theme_launcher/provider/app_icon_provider.dart';
 
 class AppsListWidget1 extends ConsumerWidget {
+  final List<String> favoriteApps; // Required parameter for apps list
+
   const AppsListWidget1({
     Key? key,
+    required this.favoriteApps,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appsState = ref.watch(appsProvider);
-
-    final favoriteApps = appsState.favoriteApps;
 
     return Container(
       width: MediaQuery.of(context).size.width,
@@ -27,6 +29,7 @@ class AppsListWidget1 extends ConsumerWidget {
                 final appPackageName = favoriteApps[index];
                 final appIconAsyncValue =
                     ref.watch(appIconProvider(appPackageName));
+
                 // Find the app data by package name in the full apps list
                 final appData = appsState.apps.firstWhere(
                   (app) => app['packageName'] == appPackageName,
@@ -48,8 +51,7 @@ class AppsListWidget1 extends ConsumerWidget {
                     loading: () => CircularProgressIndicator(),
                     error: (_, __) => CircleAvatar(
                       radius: 25,
-                      backgroundColor:
-                          Colors.grey, // Fallback color in case of error
+                      backgroundColor: Colors.grey,
                       child: Icon(Icons.error, color: Colors.white),
                     ),
                   ),
@@ -73,12 +75,14 @@ class AppsListWidget1 extends ConsumerWidget {
 
 ////
 class AppsListWidget2 extends ConsumerWidget {
-  const AppsListWidget2({Key? key}) : super(key: key);
+  final List<String> favoriteApps;
+
+  const AppsListWidget2({Key? key, required this.favoriteApps})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appsState = ref.watch(appsProvider);
-    final favoriteApps = appsState.favoriteApps;
 
     return favoriteApps.isEmpty
         ? Center(child: Text('No apps added to home screen'))
@@ -117,12 +121,14 @@ class AppsListWidget2 extends ConsumerWidget {
 
 ///
 class AppsListWidget3 extends ConsumerWidget {
-  const AppsListWidget3({Key? key}) : super(key: key);
+  final List<String> favoriteApps;
+
+  const AppsListWidget3({Key? key, required this.favoriteApps})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appsState = ref.watch(appsProvider);
-    final favoriteApps = appsState.favoriteApps;
 
     return favoriteApps.isEmpty
         ? Center(child: Text('No apps added to home screen'))
@@ -169,12 +175,14 @@ class AppsListWidget3 extends ConsumerWidget {
 
 ////
 class AppsListWidget4 extends ConsumerWidget {
-  const AppsListWidget4({Key? key}) : super(key: key);
+  final List<String> favoriteApps;
+
+  const AppsListWidget4({Key? key, required this.favoriteApps})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appsState = ref.watch(appsProvider);
-    final favoriteApps = appsState.favoriteApps;
 
     return favoriteApps.isEmpty
         ? Center(child: Text('No apps added to home screen'))
@@ -217,12 +225,13 @@ class AppsListWidget4 extends ConsumerWidget {
 
 ///
 class AppsListWidget5 extends ConsumerWidget {
-  const AppsListWidget5({Key? key}) : super(key: key);
+  final List<String> favoriteApps;
+  const AppsListWidget5({Key? key, required this.favoriteApps})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appsState = ref.watch(appsProvider);
-    final favoriteApps = appsState.favoriteApps;
 
     return favoriteApps.isEmpty
         ? Center(child: Text('No apps added to home screen'))

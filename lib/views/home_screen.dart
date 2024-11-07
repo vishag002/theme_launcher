@@ -2,14 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:theme_launcher/controller/app_screen_controller.dart';
+import 'package:theme_launcher/provider/app_list_widget_provider.dart';
 import 'package:theme_launcher/provider/clock_widget_provider.dart';
-import 'package:theme_launcher/widgets/home_screen_lists/apps_list_widget1.dart';
 
 final selectedClockWidgetProvider = StateProvider<int>((ref) => 0);
+final selectedAppListWidgetProvider = StateProvider<int>((ref) => 0);
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
-//app list widget
+  //app list widget
+  Future<int> _loadSelectedAppsListIndex() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('selectedAppListIndex') ?? 0;
+  }
 
   //clock widget
   Future<int> _loadSelectedClockIndex() async {
@@ -26,10 +31,18 @@ class HomeScreen extends ConsumerWidget {
     //
     final clockWidgetsList = ref.watch(clockWidgetListProvider);
     final selectedClockIndex = ref.watch(selectedClockWidgetProvider);
+    //
+    final appsListWidgetsList = ref.watch(appListProviderUser);
+    final selectedApplistIndex = ref.watch(selectedAppListWidgetProvider);
 
     // Initialize the selected index on the first build
     _loadSelectedClockIndex().then((savedIndex) {
       ref.read(selectedClockWidgetProvider.notifier).state = savedIndex;
+    });
+
+    //
+    _loadSelectedAppsListIndex().then((savedIndex) {
+      ref.read(selectedAppListWidgetProvider.notifier).state = savedIndex;
     });
 
     final h1 = MediaQuery.of(context).size.height;
@@ -68,9 +81,7 @@ class HomeScreen extends ConsumerWidget {
                   width: w1,
                   child: favoriteApps.isEmpty
                       ? Center(child: Text('No apps added to home screen'))
-                      : AppsListWidget1(
-                          favoriteApps: favoriteApps.cast<String>(),
-                        ),
+                      : appsListWidgetsList[selectedApplistIndex],
                 ),
               ),
             ],
